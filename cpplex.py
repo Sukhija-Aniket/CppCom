@@ -10,8 +10,10 @@ class MyLexer(object):
         'then': 'THEN',
         'while' : 'WHILE',
         'boolean' : 'BOOLEAN',
-        'package' : 'PACKAGE',
         'import' : 'IMPORT',
+        'export' : 'EXPORT',
+        'include': 'INCLUDE',
+        'module' : 'MODULE',
         'class' : 'CLASS',
         'interface' : 'INTERFACE',
         'extends' : 'EXTENDS',
@@ -34,6 +36,8 @@ class MyLexer(object):
         self.tokens = [
             'INTEGER_LITERAL',
             'IDENTIFIER',
+            'COMMENT',
+            'MULTILINE_COMMENT',
             'LE',
             'GE',
             'NE',
@@ -43,6 +47,7 @@ class MyLexer(object):
             'MINUS',
             'MULT',
             'DIVIDE',
+            'POWER',
             'LPAREN',
             'RPAREN',
             'LBRACE',
@@ -50,6 +55,8 @@ class MyLexer(object):
             'LSQPAREN',
             'RSQPAREN',
             'AT',
+            'HASH',
+            'TILDE',
             'COMMA',
             'SEMICOLON',
             'COLON',
@@ -78,6 +85,7 @@ class MyLexer(object):
         self.t_MINUS = r'-'
         self.t_MULT = r'\*'
         self.t_DIVIDE = r'/'
+        self.t_POWER = r'\^'
         self.t_LPAREN = r'\('
         self.t_RPAREN = r'\)'
         self.t_LBRACE = r'\{'
@@ -85,6 +93,8 @@ class MyLexer(object):
         self.t_LSQPAREN = r'\['
         self.t_RSQPAREN = r'\]'
         self.t_AT = r'@'
+        self.t_HASH = r'\#'
+        self.t_TILDE = r'~'
         self.t_COMMA = r','
         self.t_SEMICOLON = r';'
         self.t_COLON = r':'
@@ -115,6 +125,12 @@ class MyLexer(object):
 
     def t_COMMENT(self, t):
         r'\/\/.*'
+        pass
+        # No return value. Token discarded
+    
+    def t_MULTILINE_COMMENT(self, t):
+        r'\/\*(.|\n)*?\*\/'
+        t.lexer.lineno += t.value.count('\n')
         pass
         # No return value. Token discarded
 
@@ -149,20 +165,16 @@ class MyLexer(object):
             print(tok)
             print(tok.type, tok.value, tok.lineno, tok.lexpos)
 
-# lexer = lex.lex()
+'''To use Lexer Independently, uncomment the below code'''
+# mylexer = MyLexer()
+# lexer = mylexer.build()
 
-data = '''
-class ABC {
-    
-    public static void main(int a, int b) {
-        System.out.println("Some Random Function");
-    }
-}
-'''
+# with open('testcases_input/wave-test.cc', 'r') as file:
+#     data = file.read() 
 
 # lexer.input(data)
 
-# #Tokenize
+# # Tokenize
 # while True:
 #     tok = lexer.token()
 #     if not tok: 

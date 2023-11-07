@@ -1,8 +1,6 @@
 import sys
-from javalex import MyLexer
-from javaparse import MyParser
-
-
+from cpplex import MyLexer
+from cppparse import MyParser
 
 data  = sys.stdin.read()
 myLexer = MyLexer()

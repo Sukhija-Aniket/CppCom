@@ -1,4 +1,3 @@
-from cppCom.cpplex import MyLexer
 import ply.yacc as yacc
 
 class MyParser(object):
@@ -28,27 +27,41 @@ class MyParser(object):
         
 
     def p_Statement(self, p):
-        '''Statement : PackageDeclaration
-                    | StaticImportStatement
+        '''Statement : ModuleDeclaration
                     | ImportStatement
+                    | ExportImportStatement
+                    | ModuleStatement
+                    | IncludeStatement                   
                     | OtherStatement'''
         if p[1] == 'OtherStatement':
             pass
         else:
             p[0] = p[1]
 
-    def p_PackageDeclaration(self, p):
-        'PackageDeclaration : PACKAGE DotIdentifier SEMICOLON'
-        p[0] = p[2]
-
-    def p_StaticImportStatement(self, p):
-        'StaticImportStatement : IMPORT STATIC DotIdentifier SEMICOLON'
+    def p_ModuleDeclaration(self, p):
+        'ModuleDeclaration : EXPORT MODULE DotIdentifier SEMICOLON'
         p[0] = p[3]
 
     def p_ImportStatement(self, p):
         'ImportStatement : IMPORT DotIdentifier SEMICOLON'
-        p[0] = p[2] 
+        p[0] = p[2]
+
+    def p_ExportImportStatement(self, p):
+        'ExportImportStatement : EXPORT IMPORT DotIdentifier SEMICOLON'
+        p[0] = p[3] 
+
+    def p_ModuleStatement(self, p):
+        'ModuleStatement : MODULE DotIdentifier SEMICOLON'
+        p[0] = p[2]
         
+    def p_IncludeStatement(self, p):
+        '''IncludeStatement : HASH INCLUDE STRING_LITERAL
+                            | HASH INCLUDE Include'''
+        p[0] = p[3]
+
+    def p_Include(self, p):
+        'Include : LESS DotIdentifier GREATER'
+        p[0] = p[2]
 
     def p_DotIdentifier(self, p):
         '''DotIdentifier : IDENTIFIER RemainingIdentifierList'''
@@ -87,6 +100,8 @@ class MyParser(object):
                     | LBRACE
                     | RBRACE
                     | AT
+                    | TILDE
+                    | HASH
                     | QUOTE
                     | SEMICOLON
                     | DOT
@@ -127,6 +142,8 @@ class MyParser(object):
                     | FLOAT_LITERAL
                     | STRING_LITERAL
                     | IDENTIFIER
+                    | COMMENT
+                    | MULTILINE_COMMENT
                     | EQUAL
                     | DOUBLEQUOTE
                     | DOLLAR
@@ -136,7 +153,8 @@ class MyParser(object):
                     | BITAND
                     | BITOR
                     | COLON
-                    | DIVIDE'''
+                    | DIVIDE
+                    | POWER'''
         pass
 
     def p_empty(self, p):
@@ -144,7 +162,7 @@ class MyParser(object):
         pass
 
     def p_error(self, p):
-        print("Syntax error")
+        print("Syntax error", self, p)
 
 
     def build(self, lexer):
@@ -153,3 +171,6 @@ class MyParser(object):
     def test(self, data):
         result = self.parser.parse(data,lexer=self.lexer)
         print(result)
+
+'''To operate parser independently, just Uncomment the below code'''
+# TODO: write code to use parser independantly.
